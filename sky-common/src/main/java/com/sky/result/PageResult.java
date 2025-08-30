@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 封装分页查询结果
+ * Serializable使得类的实例能够被序列化和反序列化
  */
 @Data
 @AllArgsConstructor
@@ -18,7 +19,5 @@ public class PageResult implements Serializable {
     private long total; //总记录数
 
     private List records; //当前页数据集合
-
-    private String a;
 
 }
