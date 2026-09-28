@@ -8,10 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RequestMapping("/admin/dish")
 @RestController
@@ -32,6 +30,20 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品:{}", dishDTO);
         dishService.saveWithFlavors(dishDTO);
+        return Result.success();
+    }
+
+
+    /**
+     * 批量删除菜品
+     * @param ids
+     * @return
+     */
+    @ApiOperation(value = "批量删除菜品")
+    @DeleteMapping
+    public Result deleteByDishIds(@RequestParam List<Long> ids) {
+        log.info("批量删除菜品:{}", ids);
+        dishService.deleteBatch(ids);
         return Result.success();
     }
 }

@@ -3,8 +3,11 @@ package com.sky.mapper;
 import com.sky.annotation.AutoFill;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface DishMapper {
@@ -23,4 +26,16 @@ public interface DishMapper {
      */
     @AutoFill(value = OperationType.INSERT)
     void insert(Dish dish);
+
+    @Select("select * from dish where id = #{dishId}")
+    Dish getByDishId(Long dishId);
+
+    /**
+     * 根据主键删除菜品数据
+     * @param dishId
+     */
+    @Delete("delete from dish where id = #{dishId}")
+    void deleteByDishId(Long dishId);
+
+    void deleteByDishIds(List<Long> dishIds);
 }

@@ -1,10 +1,14 @@
 package com.sky.service.impl;
 
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetMealMapper;
 import com.sky.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -22,6 +26,8 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetMealMapper setmealMapper;
 
     /**
      * 新增菜品
@@ -48,4 +54,34 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(flavors);
         }
     }
+
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        // 可以一次删除一个菜品，也可以批量删除菜品
+        ids.forEach(id -> {
+            // 起售中的菜品不能删除
+            if (StatusConstant.ENABLE.equals(dishMapper.getByDishId(id).getStatus())) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        });
+
+        // 被套餐关联的菜品不能删除
+        List<Long> setmealIds = setmealMapper.getSetmealIdsByDishIds(ids);
+        if (setmealIds != null && setmealIds.size() > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
+        }
+
+//        ids.forEach(id -> {
+//            // 删除菜品
+//            dishMapper.deleteByDishId(id);
+//
+//            // 除菜品后，关联的口味数据也需要删除掉
+//            dishFlavorMapper.deleteByDishId(id);
+//        });
+
+        dishMapper.deleteByDishIds(ids);
+
+        dishFlavorMapper.deleteByDishIds(ids);
+    }
+
 }

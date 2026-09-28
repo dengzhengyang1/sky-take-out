@@ -1,9 +1,13 @@
 server:
   port: 8080
 
+#  spring 框架配置根节点，下面所有属性都属于 Spring 的配置
 spring:
+#  Spring 环境多环境配置，用来区分不同运行环境 (dev 开发、test 测试、prod 生产)
   profiles:
+#    **激活 dev 环境**，会自动读取`application-dev.yml`配置文件，加载 dev 环境下的数据库、端口等自定义配置
     active: dev
+#    main-- Spring 应用主程序配置 , allow-circular-references: true -- 允许 Bean 循环依赖,不建议开启,尽量解决代码层面的循环依赖
   main:
     allow-circular-references: true
   datasource:
@@ -42,3 +46,10 @@ sky:
     access-key-id: ${sky.alioss.access-key-id}
     access-key-secret: ${sky.alioss.access-key-secret}
     bucket-name: ${sky.alioss.bucket-name}
+
+
+#    1. 这里`${sky.xxx}`的变量全部定义在`application-dev.yml`，当前文件是公共配置`application.yml`；
+#    2. 执行逻辑：spring.profiles.active=dev → 加载 application.yml + application‑dev.yml，dev 文件填充占位符；
+#    3. mysql8 驱动：`com.mysql.cj.jdbc.Driver`；mysql5 驱动：`com.mysql.jdbc.Driver`；
+#    4. allow‑circular‑references 尽量不要随便开，代码层面优先解决循环依赖；
+#    5. druid 需要导入 druid-spring-boot-starter 依赖，否则配置不会生效。
